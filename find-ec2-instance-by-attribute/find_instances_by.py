@@ -40,7 +40,7 @@ for region in regions['Regions']:
 	for reservation in response["Reservations"]:
 	    for instance in reservation["Instances"]:
 		if instance[findby] == findval:
-		# This sample print will output entire Dictionary object
-		#print(instance)
-		# This will print will output the value of the Dictionary key 'InstanceId'
-			print regionname,":",instance["Placement"]["AvailabilityZone"],instance["InstanceId"],":",findby,":",instance[findby]
+			# This sample print will output entire Dictionary object
+			#print(instance)
+			# This will print will output the value of the Dictionary key 'InstanceId'
+			print regionname,":",instance["Placement"]["AvailabilityZone"],instance["InstanceId"],":",findby,":",instance[findby]," (",instance["State"]["Name"],")"
