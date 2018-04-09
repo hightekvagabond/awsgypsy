@@ -1,0 +1,20 @@
+
+Lessons From MapBox moving to ECS:
+
+Benefits:
+1) better savings
+2) faster and more flexible scaling
+3) increases developer productivity
+4) Opensource -> Private infrastructure: Consistentcy across organisation, Cost Clarity, Empowering teams
+5) Helped seperate infrastucture from core code
+6) Consistency across organization 
+7) Cost Clairity: running ecs on spot by default
+8) Empowering Teams
+
+-------------------
+
+
+
+
+
+

@@ -1,0 +1,50 @@
+     scheduling and orcheestration 
+---------------------------------------
+cluster managre    |  Placement engine
+
+
+managing the ec2 that orchestrates is the problem that fargate solvse
+
+
+fargate is fully managed infrastructure and it's scalable and fully integrated with aws as a first level primative 
+
+
+Task Definition is an Immutable versioned document, identified with family
+
+
+billed per second for cpu and memory with a 1 minute min
+
+you specify the subnet within your vpc to launch in
+
+you can configure a public ip and security groups as you see fit
+
+only the application load balancer and network loadbalancer are supported by fargate defined in task definition
+
+fargate only supports effemeral storage with ebs
+
+writable layer storage for containers (10GB total available across all containers) -only visible to this docker 
+
+
+volume storage writable and readable by all containers for a total of 4GB and it's then mounted so they can share data
+
+3 layers of permisions:
+	1) Cluster layer permisions
+	2) Application Permisions
+	3) Housekeeping permisions - takeke actions as a service on behalf of the application
+
+
+can log to cloudwatch if the policy allows it
+
+
+task level meta data can now be accessed
+
+you can define container health checks
+
+
+
+
+
+
+
+
+

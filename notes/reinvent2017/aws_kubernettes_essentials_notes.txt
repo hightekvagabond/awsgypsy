@@ -1,0 +1,67 @@
+
+
+follow Kellsey Hardtower's blog to learn the internals of what is going on "Kubernetes the hard way"
+
+Master Node has:
+	- API Server  (auth over TLS, rest via http)
+	- Scheduler
+	- Controler Manager  (you set desired state, it keeps it)
+	    - Flags: Cloud Provider (native integration for ELB, EBS, ECR, VPC), 
+	- etcd for persistent state
+
+
+Kubectl:
+	- CLI
+	- SDK
+	   - Python
+	   - GO
+
+
+
+NODES:
+	- runs kubelet (the agent, talks to the API server on master)
+	- runs kubeproxy
+
+
+
+
+
+
+
+Kube2IAM lets you assume role to a pod
+
+EKS will include multimaster across multi region, and it will manage etcd
+
+containers in a POD can talk to each other, and are scheduled together
+Has application contianer, and side car containers that do things like monitoring
+
+ECS calls a POD a task
+
+
+All Clusters need to be seperatly deployed per region/vpc
+
+Pod is a super container
+
+
+
+
+
+Know: Replica Sets and Deployments
+
+
+Namespaces are good for multitenancy
+
+HELM does package management
+
+
+
+Calico helps enforce policys for security within k8
+
+Flannel does an overlay network to avoid the limit for the VPC routing table
+
+
+
+
+
+
+
