@@ -1,0 +1,1 @@
+{{path}}/getips.pl {{src_URL}} > {{config_dir}}/trustied_ips
