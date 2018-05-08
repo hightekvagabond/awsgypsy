@@ -1,6 +1,6 @@
 #!/usr/local/bin/perl
 
-package AwsGypsy::Config;
+package AwsGypsy;
 
 require Exporter;
 @ISA = qw(Exporter);
@@ -25,7 +25,7 @@ sub new {
   if ($AwsGypsy::root_configdir =~ /^~/){
   	$AwsGypsy::root_configdir =~ s/^~/$ENV{'HOME'}/g;
   	}
-  print "checking for $AwsGypsy::root_configdir\n";
+  #print "checking for $AwsGypsy::root_configdir\n";
   if (-d $AwsGypsy::root_configdir) {
 	print "$AwsGypsy::root_configdir is a directory\n" if $::DEBUG<1;
 	}
@@ -109,6 +109,7 @@ sub new {
 
   die "no account number saved to fix this, manually edit the file $self->{'config_dir'}/account_number and put the aws account number in it" if !$self->{'acct_num'};
 
+  $self->{'apps'} = {};
 
 
   #and again with the bless.
