@@ -36,12 +36,3 @@ def lambda_handler(event, context):
         PublishToSNS(os.environ['snsarn'],'Warning: Watched Cloudtrail ' + TrailName + ':' + EventName + ' see logs at s3://' + os.environ['awsgypsybucket'] + '/Logs/CloudTrailWatcher/' + event['id'] + '.json')
     return 'lambda'
 
-def SaveToS3(bucket,id,message):
-    s3client = boto3.client('s3')
-    s3client.put_object(Body=message, Bucket=bucket, Key='Logs/' + myscriptname + '/' + id + '.json')
-    
-def PublishToSNS(sns,message):
-    client = boto3.client('sns')
-    response = client.publish( TopicArn=sns,  Message=message)
-
-
