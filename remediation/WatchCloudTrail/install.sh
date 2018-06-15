@@ -1,16 +1,16 @@
 #!/bin/bash
 
-
+#move these out to config once it's tested
 snstopic='ai-infra-cloudtrail-toggle'
+#account=$1
 account='830488934692'
 email='grogers@nvidia.com'
 tmpdir='/tmp/keep_on_cloudtrail'
 region='us-west-2'
 
 
-
-
 #Note: in my .aws/credentials file I keep a profile for each account by account number for this to work for you then you need to do the same
+#      Long term, when we move to running these things with roles via lambda it will get easier
 #
 # ie.
 # for account 123456789
