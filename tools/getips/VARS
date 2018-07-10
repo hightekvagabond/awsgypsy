@@ -1,0 +1,3 @@
+required:app_tools_getips_src_url:What URL do you wish to pull your ips from?
+optional:app_tools_getips_start_string:What String should I start parsing at?
+optional:app_tools_getips_end_string:What String should I stop the parse at?

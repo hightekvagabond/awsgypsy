@@ -1,0 +1,2 @@
+password=$(aws ssm get-parameters --region us-west-2 --names /demo/db-password \
+    --with-decryption --query Parameters[0].Value|sed 's/^"\(.*\)"$/\1/')

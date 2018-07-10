@@ -1,0 +1,36 @@
+
+
+
+Points to Optimize:
+
+1) Lean Function
+
+	Avoid fat monolithic funcionts
+	Control the dependencies in function
+    	optimize for your language (Node: Browserfy, Minify)
+        Lambda procsses a single event per container
+	no need for nonb locking execution on the front end
+	containers are reused, lazy load variables in global scope
+	DON'T LOAD IT IF YOU DON'T NEED IT
+	seperate lambda handler from core logic
+	use functions transform not transport data
+	read only what you need, query filters in amazon aurora, use s3 select
+	tune your compute memory to only what you need
+   	get aws-lambda-power-tuning to tune settings
+	Don't bother with orchestration in your code: split into multiple functions instead with step functions
+
+
+2) Eventful Invocations
+
+	Sussinct Payloads, resilient routing, concurrent exicustiuon
+	chose a good entry point
+	discard uninteresting events asap
+	
+
+3) Coordinated Calls
+
+4) Serviceful Operations
+
+
+
+

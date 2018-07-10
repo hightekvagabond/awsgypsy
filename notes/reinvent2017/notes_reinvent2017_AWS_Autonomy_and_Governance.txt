@@ -1,0 +1,52 @@
+
+Focus on the problem at hand, don't try to predict the future, use Saas whenever possible.
+
+Gain buy-in early, security from the start, Security as a consumer 
+
+"Freedom with guard rails"
+
+start with something simple
+
+
+Goal of pipeline factory:
+- Reduce barrier to engry
+- reduce snowflakes
+- reduce setup time
+- Enforce security controls
+
+
+Continuius Delivery -- Self-service -- Monitor
+
+No humans in the CD pipeline
+
+Codepipeline: 
+  Pipeline only path to production (no manual process available)
+  Trigger on commit
+  1 pipeline per deployable artifact
+  All infrastructure is managed as code
+
+
+Job DSL lets you define Jenkins jobs in the code
+
+used "AWS Service Catalog" to impliment pipeline factory
+
+Don't just build the tooling, document how to onboard yourself and  solve common problems
+
+CfnNag to examine cloudformation for common security issues
+
+Monitor with Cloud Custodian:
+github.com/capitoalone/cloud-custodian
+
+
+3M uses a lambda program called "Govenor" which uses a set of rules stored in Dynomo DB to check for security holes.
+
+Create a pipeline dashboard: cycle time, lead time, lead time to failure, recovery time, how long does it take a pipeline to fail
+
+
+only manual step is approve/reject
+
+https://stelligent.com/dev332
+
+pipeline dashboard in that link
+
+

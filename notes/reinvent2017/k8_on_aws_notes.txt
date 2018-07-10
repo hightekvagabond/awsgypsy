@@ -1,0 +1,134 @@
+
+
+Arun Gupta
+@arungupta
+
+1) Clustter Setup
+2) CI/CD with appli ations
+3) AWS IAM
+4) Visibility
+
+
+Setup:
+
+Dev - Minikube
+Community - Kops
+- List: kubernetes-aws.io
+
+
+Kops has a slack channel and an office hours, from SIG AWS
+
+
+EKS is a managed k8 control plane, highly avaiable master and etcd
+
+bring your own worker nodes like ecs
+
+
+they do maintaining, patching, and scaling
+
+
+
+api:
+
+aws eks creat-cluster --cluster-name <> --desired-master-version <> --role-arn <>
+
+no forking of k8
+
+Zalando:
+
+
+Setup: multiple aws accounts, one cluster per account
+
+No AMI customization
+
+Flannel overlay network because they support nodes over 50
+
+Immunitable Infra:
+- no updates of nodes
+- nodes replaced on update
+
+
+Auto scaling group that goes across 3 az for masters
+
+Created a cluster registry that tracks all the info about each cluster
+(opensourced)
+
+cluster lifecycle manager: makes sure that changes are applied to clusters
+
+
+CI/CD:
+
+Jenkins.... trigger on git 
+
+Code pipeline -> Codecommit -> aws codebuild -> Lambdsa to deploy
+
+
+AMI:
+
+kops creates roles
+
+githiub.com/heptio/authenticator
+
+Lets you pass an Identity to Kiubectl
+
+Authorizes AWS Identity with RBAC
+
+
+There is an IAM for master, and one for worker, but we want it for each pod...
+kube2iam: github/jtblin/kube2iam (sets up temporary credentials per pod)  [not recomended]
+
+Hashicorp Vault
+SEcures, stored ans controls access to toknes, passwords, certificates
+Generate IAM credentials
+
+
+
+In the future there will be: Secure Protection Icentity Framework for Everyone (SPIFFE)
+
+
+Visibility:
+
+Logs, Metrics, Events, Alerts, and Tracking 
+
+---for---
+
+Cluster, Node, Container, Application
+
+
+Logs: Kubectl logs - Elasticsearch, Fluenbtd, Kibana
+      Zaloza uses Scalyr instead of Kubectl logs
+      (applications just push to STDOUT and STDERR)
+
+Master: Push logs to cloudwatch to aws elastic serach service
+
+
+Metrics: Node Exporter, Pod/container metrics (cAdvisor or Kube-state-metrics), Application Metrics using Promethius client
+    -- Cluster wide aggregator (Promethius or Heapster)
+    -- Data Model with InfluxDB or Graphite
+
+
+Alert: Alert manager or kapacitor
+    -- Z uses ZMON (it's opensourced) with Promethius as an exporter
+    -- uses Heapster to collect pod mettrics
+
+Visualizer: Grafana, kibana, dashbaord
+
+
+Application Tracing:
+   -- Xray (install as deamon on each node)
+   
+
+Monitor: Latency, number of deploymenbts, number of pods, memory, cpu, latency
+
+
+More factors to consider:
+Configure sane defaults
+Kknow and understand cluster lmiits
+simplify user experience
+
+
+------***********------
+github.com/aws-samples/aws-workshop-for-kubernetes
+------***********------
+
+

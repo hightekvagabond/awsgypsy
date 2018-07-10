@@ -1,0 +1,57 @@
+
+
+
+use Cloudtrail to track every users activity and api usage
+
+vpc flow logs show the network traffic
+
+cloudwatch logs is for storing logs, monitoring, and access
+
+dns logs are an input for gaurd duty
+
+cloudwatch logs can have subscriptions to anylize real time feeds of logs, so that lambda functions can auto remediate (as an example)
+
+Amazon GuardDuty is for threat detection for aws accounts and ec2 instances
+
+Amazon Macie is a tool for watching your data and threats related to it
+
+Guard Duty watches for known threats and does anomaly detection then generates a "finding"
+
+Guard Duty has multi account support
+
+Macie uses Natural Language Processing to detect and understand the data, it also givese alerts for unusual activity
+
+Macie allows you to set up alerts for serachings for sensitive data with rules, such as filese with credit card numbers older than 6 months
+
+Macie only supports s3 and cloudtrail for now, but will expand to other data stores soon
+
+AWS Config rulese tracks your config changese that violate your rules
+
+Cloud WAtch Events triggers for lambda auto remediation
+
+AWS Shield Advanced - stops DDOS and Targeted attacks and such
+
+AWS WAF - web security rules for the application
+
+usee the edge serevices with WAF rules as much as possible to protect your core data
+
+cloudfront is a great way to avoid DDOS
+
+WAF allows you to count interesting patterns that happen so you can see whats happeneing and how often
+
+aws.amazon.com/solutions/latest/aws-waf-security-automations/welcome.html
+
+AWS Lambda for responsing
+
+AWS Systems Manager automatically patches and poractivly mitigate threats and the instance level
+
+Advisary -> enviroment -> cloudwatvh event -> lambda responder
+
+in guard duty you can "generate samples"for building automation
+
+when creating an event in cloudwatch to turn back on cloudtrail if it gets turned off you are watching for the Specific Operations of StopLogging and DeleteTrail
+
+
+
+
+

@@ -1,0 +1,7 @@
+
+Transfer acceleration lets you upload locally and then reduces latency by using their backbone
+
+
+
+
+
