@@ -1,0 +1,132 @@
+[
+  {
+    "schemaVersion": "2.0",
+    "accountId": "830488934692",
+    "region": "us-west-2",
+    "partition": "aws",
+    "id": "c2b20d00ad304a35722f1ee3754fb60a",
+    "arn": "arn:aws:guardduty:us-west-2:830488934692:detector/feb20ce6d69765b35e3370047f281874/finding/c2b20d00ad304a35722f1ee3754fb60a",
+    "type": "Recon:EC2/PortProbeUnprotectedPort",
+    "resource": {
+      "resourceType": "Instance",
+      "instanceDetails": {
+        "instanceId": "i-00e8eb823079c24ab",
+        "instanceType": "t2.small",
+        "launchTime": "2017-12-15T17:34:26Z",
+        "platform": null,
+        "productCodes": [],
+        "iamInstanceProfile": null,
+        "networkInterfaces": [
+          {
+            "ipv6Addresses": [],
+            "networkInterfaceId": "eni-defb9afd",
+            "privateDnsName": "ip-10-0-1-214.us-west-2.compute.internal",
+            "privateIpAddress": "10.0.1.214",
+            "privateIpAddresses": [
+              {
+                "privateDnsName": "ip-10-0-1-214.us-west-2.compute.internal",
+                "privateIpAddress": "10.0.1.214"
+              }
+            ],
+            "subnetId": "subnet-48c3932e",
+            "vpcId": "vpc-f0444e96",
+            "securityGroups": [
+              {
+                "groupName": "jenkins-securitygroup",
+                "groupId": "sg-67ae5d1b"
+              }
+            ],
+            "publicDnsName": "ec2-34-209-58-210.us-west-2.compute.amazonaws.com",
+            "publicIp": "34.209.58.210"
+          }
+        ],
+        "tags": [
+          {
+            "key": "Name",
+            "value": "jenkins-server"
+          }
+        ],
+        "instanceState": "running",
+        "availabilityZone": "us-west-2a",
+        "imageId": "ami-06b94666",
+        "imageDescription": "null"
+      }
+    },
+    "service": {
+      "serviceName": "guardduty",
+      "detectorId": "feb20ce6d69765b35e3370047f281874",
+      "action": {
+        "actionType": "PORT_PROBE",
+        "portProbeAction": {
+          "portProbeDetails": [
+            {
+              "localPortDetails": {
+                "port": 8080,
+                "portName": "Unknown"
+              },
+              "remoteIpDetails": {
+                "ipAddressV4": "196.52.43.129",
+                "organization": {
+                  "asn": "60781",
+                  "asnOrg": "LeaseWeb Netherlands B.V.",
+                  "isp": "LogicWeb Inc",
+                  "org": "LogicWeb Inc"
+                },
+                "country": {
+                  "countryName": "United States"
+                },
+                "city": {
+                  "cityName": "Edison"
+                },
+                "geoLocation": {
+                  "lat": 40.4981,
+                  "lon": -74.3194
+                }
+              }
+            },
+            {
+              "localPortDetails": {
+                "port": 22,
+                "portName": "SSH"
+              },
+              "remoteIpDetails": {
+                "ipAddressV4": "61.33.201.100",
+                "organization": {
+                  "asn": 3786,
+                  "asnOrg": "LG DACOM Corporation",
+                  "isp": "LG DACOM Corporation",
+                  "org": "LG DACOM Corporation"
+                },
+                "country": {
+                  "countryName": "South Korea"
+                },
+                "city": {
+                  "cityName": ""
+                },
+                "geoLocation": {
+                  "lat": 37.5112,
+                  "lon": 126.97409999999999
+                }
+              }
+            }
+          ],
+          "blocked": false
+        }
+      },
+      "resourceRole": "TARGET",
+      "additionalInfo": {
+        "threatName": "Scanner",
+        "threatListName": "ProofPoint"
+      },
+      "eventFirstSeen": "2018-06-19T21:37:19Z",
+      "eventLastSeen": "2018-06-19T21:38:17Z",
+      "archived": false,
+      "count": 1
+    },
+    "severity": 2,
+    "createdAt": "2018-06-19T21:44:13.664Z",
+    "updatedAt": "2018-06-19T21:44:13.664Z",
+    "title": "Unprotected port on EC2 instance i-00e8eb823079c24ab is being probed.",
+    "description": "EC2 instance has an unprotected port which is being probed by a known malicious host."
+  }
+]

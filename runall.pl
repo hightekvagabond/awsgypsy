@@ -1,6 +1,6 @@
 #!/usr/local/bin/perl
 
-use lib 'lib/';
+use lib 'awsgypsylib/';
 use AwsGypsy;
 use JSON;
 use Data::Dumper;

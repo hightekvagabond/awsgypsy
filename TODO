@@ -1,0 +1,18 @@
+Tasks to do:
+
+	1) Lambda To turn on cloudTrail when off/deleted -- done
+	2) Lambda to block Malicious ips when GuardDuty Detects probing
+        3) Reports:
+		a) Unused Credentials
+		b) old Credentials
+		c) unencrypted Volumes
+		d) detached volumes
+	4) Dynamically create security groups for trusted ips
+
+
+	* ) remediations for all high security Guard Duty Alerts
+	* ) alerts for all GuardDuty Alerts
+	* ) Low hanging Fruit in reports
+	* ) Install for WatchCloudTrail as a lambda
+	* ) move to an s3 hosted solution
+	

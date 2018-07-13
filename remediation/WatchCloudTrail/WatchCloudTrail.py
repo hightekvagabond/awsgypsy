@@ -36,3 +36,4 @@ def lambda_handler(event, context):
         PublishToSNS(os.environ['snsarn'],'Warning: Watched Cloudtrail ' + TrailName + ':' + EventName + ' see logs at s3://' + os.environ['awsgypsybucket'] + '/Logs/CloudTrailWatcher/' + event['id'] + '.json')
     return 'lambda'
 
+####Include: lib/AllLambdaFunctions.py
