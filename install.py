@@ -17,18 +17,9 @@ def getprefs():
 
 
         session = boto3.session.Session(profile_name=CONFIG["profile"])
-        iam_client = session.client('iam')
-
 
 	#check if the user has admin privs
-	actions = blocked(iam_client,actions=[
-	    "iam:ListUsers",
-	    "iam:ListAccessKeys",
-	    "iam:DeleteAccessKey",
-	    "iam:ListGroupsForUser",
-	    "iam:RemoveUserFromGroup",
-	    "iam:DeleteUser"
-	])
+	actions = blocked(session,actions=[ "iam:ListUsers", "iam:ListAccessKeys", "iam:DeleteAccessKey", "iam:ListGroupsForUser", "iam:RemoveUserFromGroup", "iam:DeleteUser" ])
 	print(actions)
 
 
@@ -74,7 +65,7 @@ def namedatabucket (s3, name, count):
 	return bucketname
 
 
-def blocked(aws_iam_client, actions, resources=None, context=None):
+def blocked(session, actions, resources=None, context=None):
     """test whether IAM user is able to use specified AWS action(s)
 
     Args:
@@ -87,6 +78,14 @@ def blocked(aws_iam_client, actions, resources=None, context=None):
     Returns:
         list: Actions denied by IAM due to insufficient permissions.
     """
+
+
+
+    aws_iam_client = session.client('iam')
+    current_user_arn  = session.client('sts').get_caller_identity()['Arn']
+
+
+
     if not actions:
         return []
     actions = list(set(actions))
@@ -109,7 +108,7 @@ def blocked(aws_iam_client, actions, resources=None, context=None):
 
     # You'll need to create an IAM client for this
     results = aws_iam_client.simulate_principal_policy(
-        PolicySourceArn=config.IAM_ARN, # Put your IAM user's ARN here
+        PolicySourceArn=current_user_arn, # Put your IAM user's ARN here
         ActionNames=actions,
         ResourceArns=resources,
         ContextEntries=context
