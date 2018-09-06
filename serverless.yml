@@ -53,18 +53,21 @@ provider:
 #    - exclude-me-dir/**
 
 functions:
+  #TODO: This function needs a role that can read users, read keys, and delete keys
   report_unused_iam_credentials:
     handler: report_runner/reports/unused_and_outdated_iam_credentials/unused_and_outdated_iam_credentials.lambda_handler
     events:
-      - schedule: rate(1 days)
+      - schedule: rate(24 hours)
   report_unattached_unecrypted_volumes:
     handler: report_runner/reports/volume_unattached_or_unencrypted/volume_unattached_or_unencrypted.lambda_handler
   remediation_port_probe:
     handler: remediation/GuardDuty/Findings/Low-Recon-EC2-PortProbeUnprotectedPort/PortProbeUnprotectedPort.lambda_handler
-  remediation_port_unprotectedport:
-    handler: remediation/GuardDuty/Findings/Low-Recon-EC2-PortProbeUnprotectedPort/awsgypsyGDEC2PortScan_securitygroups.lambda_handler
-  remediation_GDEC2Portscan:
-    handler: remediation/GuardDuty/Findings/Medium-Recon-EC2-Portscan/GDEC2Portscan.lambda_handler
+  #Failed attempt:
+  #remediation_port_unprotectedport:
+  #  handler: remediation/GuardDuty/Findings/Low-Recon-EC2-PortProbeUnprotectedPort/awsgypsyGDEC2PortScan_securitygroups.lambda_handler
+  #Nothing to see here:
+  #remediation_GDEC2Portscan:
+  #  handler: remediation/GuardDuty/Findings/Medium-Recon-EC2-Portscan/GDEC2Portscan.lambda_handler
   remeditaiton_findings_gateway:
     handler: remediation/GuardDuty/FindingsGateway/GDFindings.lambda_handler
   remediation_cloudtrail_off:
@@ -79,6 +82,8 @@ functions:
     handler: tools/find-ec2-instance-by-attribute/find_instances_by.lambda_handler
   remediation_GDFindings:
     handler: remediation/GuardDuty/FindingsGateway/GDFindings.lambda_handler
+  system_setup_awsgypsy_s3:
+    handler: system/setup_awsgypsy_s3bucket.lambda_handler
 
 
 
