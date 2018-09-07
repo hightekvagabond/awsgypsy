@@ -1,25 +1,47 @@
 #!/usr/bin/python
 
-import boto3, sys, getopt, calendar, time
+import boto3, sys, getopt, calendar, time, json
 from botocore.client import ClientError
 
 def main():
 	CONFIG = getprefs()
+        session = boto3.session.Session(profile_name=CONFIG["profile"])
+	s3 = session.client("s3")
 
 	default_cf = 'default_install.cf'
 	with open(default_cf, 'r') as myfile:
 		templatebody = myfile.read()
 
-	response = boto3.client('cloudformation').create_stack(
+	#create parameters
+	params = []
+	configswewant = ['databucket']
+	for k in configswewant:
+		item = dict()
+		item['ParameterKey'] = k
+		item['ParameterValue'] = CONFIG[k]
+		params.append(item)
+
+	stackinfo = boto3.client('cloudformation').create_stack(
 		StackName='awsgypsy-' + str(CONFIG['account']) + '-' + str(calendar.timegm(time.gmtime())),
 		TemplateBody=templatebody,
+    		Parameters=params,
 		Capabilities=[ 'CAPABILITY_IAM' ]
 		)	
 
-		#TODO: put these back when we are reading them
-    		#Parameters=[CONFIG],
+	#print json.dumps(CONFIG)
+	print stackinfo
+	
+	s3.put_object(Body=json.dumps(CONFIG), Bucket=CONFIG['databucket'], Key=CONFIG['account'] + '/CONFIG.json')
 
-	print response
+
+	#TODO: query the stack until it's complete and you can pull the region from the output then put the region in the path
+
+
+	#s3.put_object(Body=json.dumps(stackinfo), Bucket=CONFIG['databucket'], Key=CONFIG['account'] + '/stackinfo.json')
+
+	
+	
+	
 
 
 
