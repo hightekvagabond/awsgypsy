@@ -1,10 +1,29 @@
 #!/usr/bin/python
 
-import boto3, sys, getopt
+import boto3, sys, getopt, calendar, time
 from botocore.client import ClientError
 
 def main():
-	#CONFIG = getprefs()
+	CONFIG = getprefs()
+
+	default_cf = 'default_install.cf'
+	with open(default_cf, 'r') as myfile:
+		templatebody = myfile.read()
+
+	response = boto3.client('cloudformation').create_stack(
+		StackName='awsgypsy-' + str(CONFIG['account']) + '-' + str(calendar.timegm(time.gmtime())),
+		TemplateBody=templatebody,
+		Capabilities=[ 'CAPABILITY_IAM' ]
+		)	
+
+		#TODO: put these back when we are reading them
+    		#Parameters=[CONFIG],
+
+	print response
+
+
+
+
 
 def getprefs():
 	CONFIG = dict()
