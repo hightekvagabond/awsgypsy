@@ -4,7 +4,7 @@ import boto3, sys, getopt
 from botocore.client import ClientError
 
 def main():
-	CONFIG = getprefs()
+	#CONFIG = getprefs()
 
 def getprefs():
 	CONFIG = dict()
@@ -58,7 +58,7 @@ def getprefs():
 
 	print("bucketname: " + CONFIG["databucket"])
 
-	if raw_input("Set up UI? [y/n] ").lower()[:1] == "y" :
+	if raw_input("Set up UI? [Y/n] ").lower()[:1] != "n" :
 		default_ui_bucket = "awsgypsy-" + CONFIG["account"] + "-ui"
 		CONFIG["uibucket"] = raw_input("S3 UI Bucket for storing policies and user data? [" + default_ui_bucket + "] ") or default_ui_bucket
 		CONFIG["uibucket"] = namedatabucket(s3,CONFIG["uibucket"], 0)
@@ -66,6 +66,20 @@ def getprefs():
 	print("ui bucketname: " + CONFIG["uibucket"])
 
 	#check to see if we have a zone that matches the ui bucket name 
+
+
+	print("Which sources would you like to inherrit your policies from? Enter them in order from least important to most important with an empty answer ending the list.")
+
+	policies = []
+	policy = "https://github.com/hightekvagabond/awsgypsy/default_policy.json"
+	while policy != "" :
+		policies.append(policy)
+		policy = raw_input("Policy url: ")
+
+	CONFIG["parent_policies"] = policies
+	print "Policies:"
+	for p in CONFIG["parent_policies"] :
+		print p
 
 
 
@@ -82,8 +96,7 @@ def namedatabucket (s3, name, count):
 		bucketname = bucketname + "-" + str(count)
 	try:
     		s3.head_bucket(Bucket=bucketname)
-		keep_bucket = raw_input("The bucket " + bucketname + " already exists and you have access to it. Would you like to use the existing data bucket? [y/n] ")
-		if (keep_bucket.lower()[:1] == "y"):
+		if (raw_input("The bucket " + bucketname + " already exists and you have access to it. Would you like to use the existing data bucket? [Y/n] ").lower()[:1] != "n"):
 			print("Using existing bucket '" + bucketname + "' for data and configuration")
 		else:
 			print("Adding a count index to the bucket name and trying again....")
@@ -102,7 +115,7 @@ def namedatabucket (s3, name, count):
 
 	return bucketname
 
-
+#this function figures out if the user has the required permisions
 def blocked(session, actions, resources=None, context=None):
     """test whether IAM user is able to use specified AWS action(s)
 
