@@ -14,11 +14,14 @@ def main():
 
 	#create parameters
 	params = []
-	configswewant = ['databucket']
+	configswewant = ['databucket','account','uibucket']
 	for k in configswewant:
 		item = dict()
 		item['ParameterKey'] = k
-		item['ParameterValue'] = CONFIG[k]
+		if type(CONFIG[k]) is  list :
+			item['ParameterValue'] = (' '.join(CONFIG[k]))
+		else :
+			item['ParameterValue'] = CONFIG[k]
 		params.append(item)
 
 	stackinfo = boto3.client('cloudformation').create_stack(

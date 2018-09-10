@@ -15,4 +15,9 @@ Tasks to do:
 	* ) Low hanging Fruit in reports
 	* ) Install for WatchCloudTrail as a lambda
 	* ) move to an s3 hosted solution
+
+
+Notes:
+look over these tools:
+	https://blyx.com/2018/07/18/my-arsenal-of-aws-security-tools/
 	

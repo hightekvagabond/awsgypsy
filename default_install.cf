@@ -8,9 +8,19 @@
     "databucket" : {
       "Type" : "String",
       "Description" : "databucket"
+    },
+    "account" : {
+      "Type" : "String",
+      "Description" : "account"
+    },
+    "uibucket" : {
+      "Type" : "String",
+      "Description" : "uibucket"
     }
 
+
   },
+
 
 
 
