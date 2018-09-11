@@ -57,6 +57,11 @@ def main():
 		print "   " + item['OutputKey']+ ":" +  item['OutputValue']
 		CONFIG[item['OutputKey']] = item['OutputValue']
 
+
+	lambda_client = session.client("lambda")
+	setup_lambda_desc = lambda_client.get_function( FunctionName=CONFIG['SetupFunctionARN'])
+	setup_lambda_resp = lambda_client.invoke( FunctionName=setup_lambda_desc['Configuration']['FunctionName'])
+	print setup_lambda_resp
 	s3.put_object(Body=json.dumps(CONFIG), Bucket=CONFIG['databucket'], Key=CONFIG['setupkey'])
 
 
