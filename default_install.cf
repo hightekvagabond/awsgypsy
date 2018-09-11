@@ -9,9 +9,14 @@
       "Type" : "String",
       "Description" : "databucket"
     },
+
     "account" : {
       "Type" : "String",
       "Description" : "account"
+    },
+    "setupkey" : {
+      "Type" : "String",
+      "Description" : "setupkey"
     },
     "uibucket" : {
       "Type" : "String",
@@ -20,8 +25,6 @@
 
 
   },
-
-
 
 
     "Resources": {
@@ -42,7 +45,7 @@
                 }
             }
         },
-        "MyLambdaFunction": {
+        "AWSGypsySetup": {
             "Type": "AWS::Lambda::Function",
             "Properties": {
                 "Handler": "index.handler",
@@ -53,10 +56,11 @@
                     ]
                 },
                 "Code": {
-                    "ZipFile": "exports.handler = (event, context, callback) => {\n    callback(null, \"Hello World!\");\n};\n"
+		  "S3Bucket" : { "Ref" : "databucket" },
+		  "S3Key" : {"Ref" : "setupkey"}
                 },
-                "Runtime": "nodejs4.3",
-                "Timeout": "25"
+                "Runtime": "python3.6",
+                "Timeout": "300"
             }
         },
         "StatesExecutionRole": {
@@ -97,33 +101,10 @@
                     }
                 ]
             }
-        },
-        "MyStateMachine": {
-            "Type": "AWS::StepFunctions::StateMachine",
-            "Properties": {
-                "DefinitionString": {
-                    "Fn::Sub": [
-                        "{\n  \"Comment\": \"A Hello World AWL example using an AWS Lambda function\",\n  \"StartAt\": \"HelloWorld\",\n  \"States\": {\n    \"HelloWorld\": {\n      \"Type\": \"Task\",\n      \"Resource\": \"${lambdaArn}\",\n      \"End\": true\n    }\n  }\n}",
-                        {
-                            "lambdaArn": {
-                                "Fn::GetAtt": [
-                                    "MyLambdaFunction",
-                                    "Arn"
-                                ]
-                            }
-                        }
-                    ]
-                },
-                "RoleArn": {
-                    "Fn::GetAtt": [
-                        "StatesExecutionRole",
-                        "Arn"
-                    ]
-                }
-            }
         }
     },
 "Outputs" : {
-   "MyStacksRegion" : { "Value" : { "Ref" : "AWS::Region" } }
+   "MyStacksRegion" : { "Value" : { "Ref" : "AWS::Region" } },
+   "S3Key" : { "Value" : { "Fn::Join" : [ "/", [ "", {"Ref" : "account"}, "AWSGypsySetup.zip" ] ] }   }
 }
 }

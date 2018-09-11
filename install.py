@@ -1,20 +1,25 @@
 #!/usr/bin/python
 
-import boto3, sys, getopt, calendar, time, json
+import boto3, sys, getopt, calendar, time, json, zipfile
 from botocore.client import ClientError
 
 def main():
-	CONFIG = getprefs()
-        session = boto3.session.Session(profile_name=CONFIG["profile"])
+	#Get required info such as account information and source for policies
+	CONFIG, session = getprefs()
+
+	#we will need a session and s3 access later
 	s3 = session.client("s3")
 
-	default_cf = 'default_install.cf'
-	with open(default_cf, 'r') as myfile:
-		templatebody = myfile.read()
+	#put the setup lambda in s3 for the cloudformation to use
+	zf = zipfile.ZipFile('AWSGypsySetup.zip', mode='w')
+	zf.write('AWSGypsySetup.py')
+	zf.close()
+	CONFIG['setupkey'] = '/' + CONFIG['account'] + '/AWSGypsySetup.zip'
+	s3.put_object(Body=open('AWSGypsySetup.zip', 'rb'), Bucket=CONFIG['databucket'], Key=CONFIG['setupkey'])
 
-	#create parameters
+	#create parameters, this is all about putting the config information into a format the cloudformation can read
 	params = []
-	configswewant = ['databucket','account','uibucket']
+	configswewant = ['databucket','account','uibucket','setupkey']
 	for k in configswewant:
 		item = dict()
 		item['ParameterKey'] = k
@@ -24,6 +29,11 @@ def main():
 			item['ParameterValue'] = CONFIG[k]
 		params.append(item)
 
+
+	#create the initial cloudformation
+	default_cf = 'default_install.cf'
+	with open(default_cf, 'r') as myfile:
+		templatebody = myfile.read()
 	stackinfo = boto3.client('cloudformation').create_stack(
 		StackName='awsgypsy-' + str(CONFIG['account']) + '-' + str(calendar.timegm(time.gmtime())),
 		TemplateBody=templatebody,
@@ -31,48 +41,50 @@ def main():
 		Capabilities=[ 'CAPABILITY_IAM' ]
 		)	
 
-	#print json.dumps(CONFIG)
 	print stackinfo
 	
+	#write all the information used in CONFIG to the data bucket for later reference
 	s3.put_object(Body=json.dumps(CONFIG), Bucket=CONFIG['databucket'], Key=CONFIG['account'] + '/CONFIG.json')
 
+	#write the stack info to the stack info to s3 for later reference
+	s3.put_object(Body=json.dumps(stackinfo), Bucket=CONFIG['databucket'], Key=CONFIG['account'] + '/stackinfo.json')
 
 	#TODO: query the stack until it's complete and you can pull the region from the output then put the region in the path
-
-
-	#s3.put_object(Body=json.dumps(stackinfo), Bucket=CONFIG['databucket'], Key=CONFIG['account'] + '/stackinfo.json')
-
-	
-	
-	
-
-
-
 
 
 def getprefs():
 	CONFIG = dict()
 	default_profile  = 'default'
-	options, remainder = getopt.getopt(sys.argv[1:], 'a:p:', ['account=', 
-                                                         'profile=',
-                                                         ])
+	default_region = 'us-west-2'
+	#pull the account and profile from command line
+	options, remainder = getopt.getopt(sys.argv[1:], 'a:p:r:', ['account=', 'profile=','region=' ])
 	account_from_cli = ""
 	for opt, arg in options:
 	    if opt in ('-a', '--account'):
 	        account_from_cli = arg
 	    elif opt in ('-p', '--profile'):
         	default_profile = arg
+	    elif opt in ('-p', '--region'):
+		default_region = arg
 
+	#verify or get the account number
 	print "\n\nThis is the installation script for awsgypsy, to use it you must have admin access connected to your awscli profile for the account you wish to install into.\n\n"
 	CONFIG["account"] = raw_input("What is the aws account number for the account you are installing into? [" + account_from_cli + "] ") or account_from_cli
 	if CONFIG["account"] == "":
 		print "Please provide a choice account to install into"
 		sys.exit()
-	print "installing into account: " + CONFIG["account"]
+
+	#verify or get the default region
+	CONFIG["region"] = raw_input("What region are you installing into? [" + default_region + "] ") or default_region
+
+	#TODO validate region based on boto query
+
+	#verify or get the profile used from aws credentials
 	CONFIG["profile"] = raw_input("Which awscli credentials profile do you wish to use to? [" + default_profile  + "]  ") or default_profile
 
 
-        session = boto3.session.Session(profile_name=CONFIG["profile"])
+	#create an aws session for the blocked function to use to make sure the user has perms they need
+        session = boto3.session.Session(profile_name=CONFIG["profile"], region_name=CONFIG["region"])
 
 	#check if the user has admin privs
 	actions = blocked(session,actions=[ 
@@ -89,7 +101,6 @@ def getprefs():
 			print "\t" + str(act)
 		sys.exit()
 
-
 	
 	default_databucket = "awsgypsy-" + CONFIG["account"] + "-data"
 	CONFIG["databucket"] = raw_input("S3 Data Bucket for storing policies and user data? [" + default_databucket + "] ") or default_databucket
@@ -98,14 +109,14 @@ def getprefs():
 	s3 = session.client("s3")
 	if CONFIG["databucket"] == default_databucket :
 		print "checking default bucket"
-		CONFIG["databucket"] = namedatabucket(s3,CONFIG['databucket'], 0)
+		CONFIG["databucket"] = namedatabucket(s3,CONFIG['databucket'], 0, CONFIG)
 
 	print("bucketname: " + CONFIG["databucket"])
 
 	if raw_input("Set up UI? [Y/n] ").lower()[:1] != "n" :
 		default_ui_bucket = "awsgypsy-" + CONFIG["account"] + "-ui"
 		CONFIG["uibucket"] = raw_input("S3 UI Bucket for storing policies and user data? [" + default_ui_bucket + "] ") or default_ui_bucket
-		CONFIG["uibucket"] = namedatabucket(s3,CONFIG["uibucket"], 0)
+		CONFIG["uibucket"] = namedatabucket(s3,CONFIG["uibucket"], 0, CONFIG)
 
 	print("ui bucketname: " + CONFIG["uibucket"])
 
@@ -128,11 +139,11 @@ def getprefs():
 
 
 #	print "Because of the way awsgypsy works it needs to be installed individually into each region, we recomend you install into all regions even the ones you are not using so that it can watch for intrusions in other regions that you are not likely to notice as you do not log into those.\n\n"
-	return CONFIG
+	return CONFIG, session
 
 
 # this function figures out what the name of the bucket should be and creates it
-def namedatabucket (s3, name, count):
+def namedatabucket (s3, name, count, CONFIG):
 	bucketexists = False
 	bucketname = name
 	if count > 0:
@@ -148,14 +159,14 @@ def namedatabucket (s3, name, count):
 	except ClientError:
     		print "The bucket does not exist or you have no access."
 		try:
-	    		s3.create_bucket(Bucket=bucketname) 
+	    		s3.create_bucket(Bucket=bucketname, ACL='authenticated-read', CreateBucketConfiguration={ 'LocationConstraint': CONFIG["region"] } ) 
 		except ClientError:
  	    		print("failed to create " + bucketname)
 			bucketexists = True
 	if bucketexists == True:
 	    print "Recursion is your friend"
 	    count = count + 1 #this bucket exists, give it a number
-	    bucketname = namedatabucket(s3,name,count)
+	    bucketname = namedatabucket(s3,name,count,CONFIG)
 
 	return bucketname
 

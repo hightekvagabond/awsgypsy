@@ -1,0 +1,19 @@
+#!/usr/bin/python
+
+import zipfile
+import boto3
+
+CONFIG = dict()
+CONFIG['account'] = '830488934692'
+CONFIG['profile'] = 'default'
+CONFIG['databucket'] = 'awsgypsy-830488934692-data'
+
+
+zf = zipfile.ZipFile('AWSGypsySetup.zip', mode='w')
+zf.write('AWSGypsySetup.py')
+zf.close()
+
+session = boto3.session.Session(profile_name=CONFIG["profile"])
+s3 = session.client("s3")
+s3.put_object(Body=open('AWSGypsySetup.zip', 'rb'), Bucket=CONFIG['databucket'], Key=CONFIG['account'] + '/AWSGypsySetup.zip')
+
