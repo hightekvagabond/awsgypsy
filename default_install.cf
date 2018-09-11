@@ -48,7 +48,7 @@
         "AWSGypsySetup": {
             "Type": "AWS::Lambda::Function",
             "Properties": {
-                "Handler": "index.handler",
+                "Handler": "AWSGypsySetup.setup_handler",
                 "Role": {
                     "Fn::GetAtt": [
                         "LambdaExecutionRole",
@@ -105,6 +105,6 @@
     },
 "Outputs" : {
    "MyStacksRegion" : { "Value" : { "Ref" : "AWS::Region" } },
-   "S3Key" : { "Value" : { "Fn::Join" : [ "/", [ "", {"Ref" : "account"}, "AWSGypsySetup.zip" ] ] }   }
+   "SetupFunctionARN" : { "Value" : { "Fn::GetAtt" : [ "AWSGypsySetup", "Arn" ]} }
 }
 }

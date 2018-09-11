@@ -34,22 +34,30 @@ def main():
 	default_cf = 'default_install.cf'
 	with open(default_cf, 'r') as myfile:
 		templatebody = myfile.read()
-	stackinfo = boto3.client('cloudformation').create_stack(
-		StackName='awsgypsy-' + str(CONFIG['account']) + '-' + str(calendar.timegm(time.gmtime())),
+        cf_client = session.client('cloudformation')
+	mystackname = 'awsgypsy-' + str(CONFIG['account']) + '-' + str(calendar.timegm(time.gmtime()))
+	stackinfo = cf_client.create_stack(
+		StackName=mystackname,
 		TemplateBody=templatebody,
     		Parameters=params,
 		Capabilities=[ 'CAPABILITY_IAM' ]
 		)	
+	CONFIG['stack_creation_info'] = stackinfo
 
-	print stackinfo
-	
-	#write all the information used in CONFIG to the data bucket for later reference
-	s3.put_object(Body=json.dumps(CONFIG), Bucket=CONFIG['databucket'], Key=CONFIG['account'] + '/CONFIG.json')
+	mystackstatus = ''
+	while mystackstatus != "CREATE_COMPLETE" :
+		time.sleep(15)
+		stackdesc  = cf_client.describe_stacks( StackName=mystackname)
+		mystackstatus = stackdesc['Stacks'][0]['StackStatus']
+		print "Waiting for stack to complete.... current status: " + mystackstatus
 
-	#write the stack info to the stack info to s3 for later reference
-	s3.put_object(Body=json.dumps(stackinfo), Bucket=CONFIG['databucket'], Key=CONFIG['account'] + '/stackinfo.json')
+	print "Stack Is created!!!"
+	print "Outputs:"
+	for item in stackdesc['Stacks'][0]['Outputs']:
+		print "   " + item['OutputKey']+ ":" +  item['OutputValue']
+		CONFIG[item['OutputKey']] = item['OutputValue']
 
-	#TODO: query the stack until it's complete and you can pull the region from the output then put the region in the path
+	s3.put_object(Body=json.dumps(CONFIG), Bucket=CONFIG['databucket'], Key=CONFIG['setupkey'])
 
 
 def getprefs():
