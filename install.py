@@ -16,6 +16,7 @@ def main():
 	zf.close()
 	CONFIG['setupkey'] =  CONFIG['account'] + '/AWSGypsySetup.zip'
 	s3.put_object(Body=open('AWSGypsySetup.zip', 'rb'), Bucket=CONFIG['databucket'], Key=CONFIG['setupkey'])
+	os.remove("AWSGypsySetup.zip")
 
 	#create parameters, this is all about putting the config information into a format the cloudformation can read
 	params = []
