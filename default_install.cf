@@ -8,7 +8,7 @@
 		"uibucket": { "Type": "String", "Description": "uibucket" }
 	},
 	"Resources": {
-		"LambdaExecutionRole": {
+		"awsgypsyLambdaExecutionRole": {
 			"Type": "AWS::IAM::Role",
 			"Properties": {
 				"AssumeRolePolicyDocument": {
@@ -18,26 +18,6 @@
 						"Principal": { "Service": "lambda.amazonaws.com" },
 						"Action": "sts:AssumeRole"
 					}]
-				}
-			}
-		},
-		"AWSGypsySetup": {
-			"Type": "AWS::Lambda::Function",
-			"Properties": {
-				"Handler": "AWSGypsySetup.setup_handler",
-				"Role": { "Fn::GetAtt": [ "LambdaExecutionRole", "Arn" ] },
-				"Code": { "S3Bucket": { "Ref": "databucket" }, "S3Key": { "Ref": "setupkey" } },
-				"Runtime": "python3.6",
-				"Environment": { "Variables": { "databucket": { "Ref": "databucket" }, "uibucket": { "Ref": "uibucket" } } },
-				"Timeout": "300"
-			}
-		},
-		"StatesExecutionRole": {
-			"Type": "AWS::IAM::Role",
-			"Properties": {
-				"AssumeRolePolicyDocument": {
-					"Version": "2012-10-17",
-					"Statement": [{ "Effect": "Allow", "Principal": { "Service": [{ "Fn::Sub": "states.${AWS::Region}.amazonaws.com" }] }, "Action": "sts:AssumeRole" }]
 				},
 				"Path": "/",
 				"Policies": [{
@@ -78,7 +58,18 @@
 						}
 					]
 				}
+			},
+		"AWSGypsySetup": {
+			"Type": "AWS::Lambda::Function",
+			"Properties": {
+				"Handler": "AWSGypsySetup.setup_handler",
+				"Role": { "Fn::GetAtt": [ "awsgypsyLambdaExecutionRole", "Arn" ] },
+				"Code": { "S3Bucket": { "Ref": "databucket" }, "S3Key": { "Ref": "setupkey" } },
+				"Runtime": "python3.6",
+				"Environment": { "Variables": { "databucket": { "Ref": "databucket" }, "uibucket": { "Ref": "uibucket" } } },
+				"Timeout": "300"
 			}
+		}
 		},
 	"Outputs": { 
 		"MyStacksRegion": { "Value": { "Ref": "AWS::Region" } },

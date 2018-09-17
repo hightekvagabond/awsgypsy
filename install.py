@@ -14,7 +14,7 @@ def main():
 	zf = zipfile.ZipFile('AWSGypsySetup.zip', mode='w')
 	zf.write('AWSGypsySetup.py')
 	zf.close()
-	CONFIG['setupkey'] = '/' + CONFIG['account'] + '/AWSGypsySetup.zip'
+	CONFIG['setupkey'] =  CONFIG['account'] + '/AWSGypsySetup.zip'
 	s3.put_object(Body=open('AWSGypsySetup.zip', 'rb'), Bucket=CONFIG['databucket'], Key=CONFIG['setupkey'])
 
 	#create parameters, this is all about putting the config information into a format the cloudformation can read
@@ -49,6 +49,9 @@ def main():
 		time.sleep(15)
 		stackdesc  = cf_client.describe_stacks( StackName=mystackname)
 		mystackstatus = stackdesc['Stacks'][0]['StackStatus']
+		if mystackstatus == "ROLLBACK_COMPLETE" :
+			print "Something went horribly wrong, check your cloudformation events"
+			sys.exit()
 		print "Waiting for stack to complete.... current status: " + mystackstatus
 
 	print "Stack Is created!!!"
