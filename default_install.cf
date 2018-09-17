@@ -1,110 +1,87 @@
 {
-    "AWSTemplateFormatVersion": "2010-09-09",
-    "Description": "An example template with an IAM role for a Lambda state machine.",
+	"AWSTemplateFormatVersion": "2010-09-09",
+	"Description": "An example template with an IAM role for a Lambda state machine.",
+	"Parameters": {
+		"databucket": { "Type": "String", "Description": "databucket" },
+		"account": { "Type": "String", "Description": "account" },
+		"setupkey": { "Type": "String", "Description": "setupkey" },
+		"uibucket": { "Type": "String", "Description": "uibucket" }
+	},
+	"Resources": {
+		"LambdaExecutionRole": {
+			"Type": "AWS::IAM::Role",
+			"Properties": {
+				"AssumeRolePolicyDocument": {
+					"Version": "2012-10-17",
+					"Statement": [{
+						"Effect": "Allow",
+						"Principal": { "Service": "lambda.amazonaws.com" },
+						"Action": "sts:AssumeRole"
+					}]
+				}
+			}
+		},
+		"AWSGypsySetup": {
+			"Type": "AWS::Lambda::Function",
+			"Properties": {
+				"Handler": "AWSGypsySetup.setup_handler",
+				"Role": { "Fn::GetAtt": [ "LambdaExecutionRole", "Arn" ] },
+				"Code": { "S3Bucket": { "Ref": "databucket" }, "S3Key": { "Ref": "setupkey" } },
+				"Runtime": "python3.6",
+				"Environment": { "Variables": { "databucket": { "Ref": "databucket" }, "uibucket": { "Ref": "uibucket" } } },
+				"Timeout": "300"
+			}
+		},
+		"StatesExecutionRole": {
+			"Type": "AWS::IAM::Role",
+			"Properties": {
+				"AssumeRolePolicyDocument": {
+					"Version": "2012-10-17",
+					"Statement": [{ "Effect": "Allow", "Principal": { "Service": [{ "Fn::Sub": "states.${AWS::Region}.amazonaws.com" }] }, "Action": "sts:AssumeRole" }]
+				},
+				"Path": "/",
+				"Policies": [{
+						"PolicyName": "StatesExecutionPolicy",
+						"PolicyDocument": {
+							"Version": "2012-10-17",
+							"Statement": [{
+								"Effect": "Allow",
+								"Action": [ "lambda:InvokeFunction" ],
+								"Resource": "*"
+							}]
+						}
+					},
+					{
+						"PolicyName": "AWSGypsyBucketList",
+						"PolicyDocument": {
+							"Version": "2012-10-17",
+							"Statement": [{
+								"Effect": "Allow",
+								"Action": [ "s3:ListAllMyBuckets", "s3:HeadBucket" ], 
+								"Resource": "*"
+							}]
+						}},
+						{
+							"PolicyName": "AWSGypsyBucketAccess",
+							"PolicyDocument": {
+								"Version": "2012-10-17",
+								"Statement": [{
+										"Effect": "Allow",
+										"Action": "s3:*",
+										"Resource": [
+											"arn:aws:s3:::*/*",
+											{ "Fn::Join": [":", ["arn:aws:s3::", { "Ref": "databucket" }]] },
+											{ "Fn::Join": [":", ["arn:aws:s3::", { "Ref": "uibucket" }]] }
 
-
-
-  "Parameters" : {
-    "databucket" : {
-      "Type" : "String",
-      "Description" : "databucket"
-    },
-
-    "account" : {
-      "Type" : "String",
-      "Description" : "account"
-    },
-    "setupkey" : {
-      "Type" : "String",
-      "Description" : "setupkey"
-    },
-    "uibucket" : {
-      "Type" : "String",
-      "Description" : "uibucket"
-    }
-
-
-  },
-
-
-    "Resources": {
-        "LambdaExecutionRole": {
-            "Type": "AWS::IAM::Role",
-            "Properties": {
-                "AssumeRolePolicyDocument": {
-                    "Version": "2012-10-17",
-                    "Statement": [
-                        {
-                            "Effect": "Allow",
-                            "Principal": {
-                                "Service": "lambda.amazonaws.com"
-                            },
-                            "Action": "sts:AssumeRole"
-                        }
-                    ]
-                }
-            }
-        },
-        "AWSGypsySetup": {
-            "Type": "AWS::Lambda::Function",
-            "Properties": {
-                "Handler": "AWSGypsySetup.setup_handler",
-                "Role": {
-                    "Fn::GetAtt": [
-                        "LambdaExecutionRole",
-                        "Arn"
-                    ]
-                },
-                "Code": {
-		  "S3Bucket" : { "Ref" : "databucket" },
-		  "S3Key" : {"Ref" : "setupkey"}
-                },
-                "Runtime": "python3.6",
-                "Timeout": "300"
-            }
-        },
-        "StatesExecutionRole": {
-            "Type": "AWS::IAM::Role",
-            "Properties": {
-                "AssumeRolePolicyDocument": {
-                    "Version": "2012-10-17",
-                    "Statement": [
-                        {
-                            "Effect": "Allow",
-                            "Principal": {
-                                "Service": [
-                                    {
-                                        "Fn::Sub": "states.${AWS::Region}.amazonaws.com"
-                                    }
-                                ]
-                            },
-                            "Action": "sts:AssumeRole"
-                        }
-                    ]
-                },
-                "Path": "/",
-                "Policies": [
-                    {
-                        "PolicyName": "StatesExecutionPolicy",
-                        "PolicyDocument": {
-                            "Version": "2012-10-17",
-                            "Statement": [
-                                {
-                                    "Effect": "Allow",
-                                    "Action": [
-                                        "lambda:InvokeFunction"
-                                    ],
-                                    "Resource": "*"
-                                }
-                            ]
-                        }
-                    }
-                ]
-            }
-        }
-    },
-"Outputs" : {
-   "MyStacksRegion" : { "Value" : { "Ref" : "AWS::Region" } },
-   "SetupFunctionARN" : { "Value" : { "Fn::GetAtt" : [ "AWSGypsySetup", "Arn" ]} }
-}
+										]}]
+							}
+						}
+					]
+				}
+			}
+		},
+	"Outputs": { 
+		"MyStacksRegion": { "Value": { "Ref": "AWS::Region" } },
+		"SetupFunctionARN": { "Value": { "Fn::GetAtt": ["AWSGypsySetup", "Arn"] } }
+	}
 }
