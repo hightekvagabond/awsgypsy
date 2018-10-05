@@ -1,7 +1,9 @@
 #!/usr/bin/python
 
-import boto3, sys, getopt, calendar, time, json, zipfile
+import boto3, sys, getopt, calendar, time, json, zipfile, os, shutil
 from botocore.client import ClientError
+from shutil import copyfile
+
 
 def main():
 	#Get required info such as account information and source for policies
@@ -11,12 +13,18 @@ def main():
 	s3 = session.client("s3")
 
 	#put the setup lambda in s3 for the cloudformation to use
-	zf = zipfile.ZipFile('AWSGypsySetup.zip', mode='w')
-	zf.write('AWSGypsySetup.py')
-	zf.close()
+	setupdir='./setup/'
+	if not os.path.exists(setupdir):
+		os.makedirs(setupdir)
+	os.system('pip install  request -t ' + setupdir)
+	os.system('pip install  urllib2 -t ' + setupdir)
+	copyfile('./AWSGypsySetup.py', setupdir + 'AWSGypsySetup.py' )
+	ZipUtilities().addMasterFolderToZip('AWSGypsySetup.zip', setupdir)
 	CONFIG['setupkey'] =  CONFIG['account'] + '/AWSGypsySetup.zip'
-	s3.put_object(Body=open('AWSGypsySetup.zip', 'rb'), Bucket=CONFIG['databucket'], Key=CONFIG['setupkey'])
-	os.remove("AWSGypsySetup.zip")
+        s3client = session.client('s3')
+        s3client.upload_file('AWSGypsySetup.zip','awsgypsy-830488934692-data',CONFIG['setupkey'])
+	#os.remove("./AWSGypsySetup.zip")
+	#shutil.rmtree( setupdir )
 
 	#create parameters, this is all about putting the config information into a format the cloudformation can read
 	params = []
@@ -76,6 +84,7 @@ def getprefs():
 	#pull the account and profile from command line
 	options, remainder = getopt.getopt(sys.argv[1:], 'a:p:r:', ['account=', 'profile=','region=' ])
 	account_from_cli = ""
+	quiet=False
 	for opt, arg in options:
 	    if opt in ('-a', '--account'):
 	        account_from_cli = arg
@@ -83,6 +92,7 @@ def getprefs():
         	default_profile = arg
 	    elif opt in ('-p', '--region'):
 		default_region = arg
+
 
 	#verify or get the account number
 	print "\n\nThis is the installation script for awsgypsy, to use it you must have admin access connected to your awscli profile for the account you wish to install into.\n\n"
@@ -238,9 +248,39 @@ def blocked(session, actions, resources=None, context=None):
              print "Unexpected error: %s" % e
 	     sys.exit()
 
-
-
     return sorted(blocked_actions)
+
+def zipdir(path, ziph):
+    # ziph is zipfile handle
+    for root, dirs, files in os.walk(path):
+        for file in files:
+            ziph.write(os.path.join(root, file))
+
+class ZipUtilities:
+
+	#This function jumps into a folder and starts the process of adding it's contents to the zip file
+	def addMasterFolderToZip(self, filename, folder):
+		zip_file = zipfile.ZipFile(filename, 'w')
+		olddir=os.getcwd()
+		print "Building Zip file inside " + folder
+		os.chdir(folder)
+		self.addFolderToZip(zip_file, "./")
+		os.chdir(olddir)
+		zip_file.close()
+
+	#recursive function to traverse directories for adding to a zip
+	def addFolderToZip(self, zip_file, folder): 
+		for file in os.listdir(folder):
+			full_path = os.path.join(folder, file)
+			#print "full path is " + full_path
+			if os.path.isfile(full_path):
+				print 'File added: ' + str(full_path)
+				zip_file.write(full_path)
+			elif os.path.isdir(full_path):
+				print 'Entering folder: ' + str(full_path)
+				self.addFolderToZip(zip_file, full_path)
+
+
 
 
 main()
