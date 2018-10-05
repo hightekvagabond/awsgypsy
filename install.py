@@ -16,8 +16,8 @@ def main():
 	setupdir='./setup/'
 	if not os.path.exists(setupdir):
 		os.makedirs(setupdir)
+	os.system('virtualenv ' + setupdir)
 	os.system('pip install  request -t ' + setupdir)
-	os.system('pip install  urllib2 -t ' + setupdir)
 	copyfile('./AWSGypsySetup.py', setupdir + 'AWSGypsySetup.py' )
 	ZipUtilities().addMasterFolderToZip('AWSGypsySetup.zip', setupdir)
 	CONFIG['setupkey'] =  CONFIG['account'] + '/AWSGypsySetup.zip'
