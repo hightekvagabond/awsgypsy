@@ -18,7 +18,7 @@ def main():
 		os.makedirs(setupdir)
 	os.system('virtualenv ' + setupdir)
 	os.system('pip install  request -t ' + setupdir)
-	copyfile('./AWSGypsySetup.py', setupdir + 'AWSGypsySetup.py' )
+	copyfile('./install/AWSGypsySetup.py', setupdir + 'AWSGypsySetup.py' )
 	ZipUtilities().addMasterFolderToZip('AWSGypsySetup.zip', setupdir)
 	CONFIG['setupkey'] =  CONFIG['account'] + '/AWSGypsySetup.zip'
         s3client = session.client('s3')
@@ -40,7 +40,7 @@ def main():
 
 
 	#create the initial cloudformation
-	default_cf = 'default_install.cf'
+	default_cf = './install/default_install.cf'
 	with open(default_cf, 'r') as myfile:
 		templatebody = myfile.read()
         cf_client = session.client('cloudformation')
