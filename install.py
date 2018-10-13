@@ -33,7 +33,7 @@ def main():
 
     #create parameters, this is all about putting the config information into a format the cloudformation can read
     params = []
-    configswewant = ['databucket','account','uibucket','setupkey']
+    configswewant = ['databucket','account','uibucket','setupkey','githubbranch']
     for k in configswewant:
             item = dict()
             item['ParameterKey'] = k
@@ -86,7 +86,7 @@ def main():
 
     #now, run the setup function
     setup_function_name=CONFIG["SetupFunctionARN"].split(":")[-1]
-    lambda_response = session.client('lambda').invoke( FunctionName=setup_function_name,  Payload='{"key1":"value1", "key2":"value2", "key3":"value3"}' )
+    lambda_response = session.client('lambda').invoke( FunctionName=setup_function_name,  Payload='{"files":"' + ",".join(os.listdir(awsgypsydir + "/ui/"))  + '"}' )
     print(lambda_response['Payload'].read().decode("UTF8") )
 
 
@@ -99,6 +99,7 @@ def getprefs():
 
     #fill in defaults if they haven't been set
     CONFIG['profile'] = 'default'
+    CONFIG['githubbranch'] = 'master'
 
     #this section is set up just to make development of the install.py easier and faster
     default_config = json.loads(open(os.getenv('HOME') + '/.aws/awsgypsy/setup_defaults').read())
