@@ -23,12 +23,12 @@ def main():
     #virtualenv_cmd='virtualenv -p python3 ' + setupdir + '; source ' + setupdir + '; pip3 install requests -t ' + setupdir
     os.system('virtualenv -p python3 ' + setupdir)
     os.system('pip install requests -t ' + setupdir)
-    copyfile(awsgypsy_dir + '/default_install_files/AWSGypsySetup.py', setupdir + 'AWSGypsySetup.py' )
-    ZipUtilities().addMasterFolderToZip('AWSGypsySetup.zip', setupdir)
-    CONFIG['setupkey'] =  CONFIG['account'] + '/AWSGypsySetup.zip'
+    copyfile(awsgypsy_dir + '/default_install_files/copyui.py', setupdir + 'copyui.py' )
+    ZipUtilities().addMasterFolderToZip('copyui.zip', setupdir)
+    CONFIG['setupkey'] =  CONFIG['account'] + '/copyui.zip'
     s3client = session.client('s3')
-    s3client.upload_file('AWSGypsySetup.zip','awsgypsy-830488934692-data',CONFIG['setupkey'])
-    os.remove(awsgypsy_dir + "/AWSGypsySetup.zip")
+    s3client.upload_file('copyui.zip','awsgypsy-830488934692-data',CONFIG['setupkey'])
+    os.remove(awsgypsy_dir + "/copyui.zip")
     shutil.rmtree( setupdir )
 
     #create parameters, this is all about putting the config information into a format the cloudformation can read
@@ -86,7 +86,7 @@ def main():
 
     #now, run the setup function
     setup_function_name=CONFIG["SetupFunctionARN"].split(":")[-1]
-    lambda_response = session.client('lambda').invoke( FunctionName=setup_function_name,  Payload='{"files":"' + ",".join(os.listdir(awsgypsydir + "/ui/"))  + '"}' )
+    lambda_response = session.client('lambda').invoke( FunctionName=setup_function_name,  Payload='{"files":"' + ",".join(os.listdir(awsgypsy_dir + "/ui/"))  + '", "setupindex":"setup_index.html"}' )
     print(lambda_response['Payload'].read().decode("UTF8") )
 
 

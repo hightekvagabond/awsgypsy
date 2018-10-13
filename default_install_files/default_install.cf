@@ -60,10 +60,10 @@
 					]
 				}
 			},
-		"AWSGypsySetup": {
+		"copyui": {
 			"Type": "AWS::Lambda::Function",
 			"Properties": {
-				"Handler": "AWSGypsySetup.setup_handler",
+				"Handler": "copyui.setup_handler",
 				"Role": { "Fn::GetAtt": [ "awsgypsyLambdaExecutionRole", "Arn" ] },
 				"Code": { "S3Bucket": { "Ref": "databucket" }, "S3Key": { "Ref": "setupkey" } },
 				"Runtime": "python3.6",
@@ -74,6 +74,6 @@
 		},
 	"Outputs": { 
 		"MyStacksRegion": { "Value": { "Ref": "AWS::Region" } },
-		"SetupFunctionARN": { "Value": { "Fn::GetAtt": ["AWSGypsySetup", "Arn"] } }
+		"SetupFunctionARN": { "Value": { "Fn::GetAtt": ["copyui", "Arn"] } }
 	}
 }
