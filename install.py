@@ -20,8 +20,9 @@ def main():
     setupdir = awsgypsy_dir  + '/setup/'
     if not os.path.exists(setupdir):
             os.makedirs(setupdir)
-    os.system('virtualenv ' + setupdir)
-    os.system('pip install request -t ' + setupdir)
+    #virtualenv_cmd='virtualenv -p python3 ' + setupdir + '; source ' + setupdir + '; pip3 install requests -t ' + setupdir
+    os.system('virtualenv -p python3 ' + setupdir)
+    os.system('pip install requests -t ' + setupdir)
     copyfile(awsgypsy_dir + '/default_install_files/AWSGypsySetup.py', setupdir + 'AWSGypsySetup.py' )
     ZipUtilities().addMasterFolderToZip('AWSGypsySetup.zip', setupdir)
     CONFIG['setupkey'] =  CONFIG['account'] + '/AWSGypsySetup.zip'
@@ -188,6 +189,11 @@ def getprefs():
                 if CONFIG['skip_prompts'] != 'y':
                     CONFIG["uibucket"] = raw_input("S3 UI Bucket for storing policies and user data? [" + CONFIG['uibucket'] + "] ") or CONFIG['uibucket']
                 CONFIG["uibucket"] = namedatabucket(s3,CONFIG["uibucket"], 0, CONFIG)
+                response = s3.put_bucket_policy( Bucket=CONFIG['uibucket'], Policy=open(awsgypsy_dir + "/default_install_files/ui_bucket_policy").read().replace('[[mybucketname]]', CONFIG['uibucket']))
+                # Create the configuration for the website
+                website_configuration = { 'ErrorDocument': {'Key': 'error.html'}, 'IndexDocument': {'Suffix': 'index.html'}, }
+                # Set the new policy on the selected bucket
+                s3.put_bucket_website( Bucket=CONFIG['uibucket'], WebsiteConfiguration=website_configuration)
 
     print("ui bucketname: " + CONFIG["uibucket"])
 
