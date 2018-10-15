@@ -28,8 +28,18 @@ def main():
     CONFIG['setupkey'] =  CONFIG['account'] + '/copyui.zip'
     s3client = session.client('s3')
     s3client.upload_file('copyui.zip','awsgypsy-830488934692-data',CONFIG['setupkey'])
+
+    policyfile = 'parent_policies.json'
+    with open(policyfile, 'w') as outfile:
+        json.dump(CONFIG["parent_policies"] ,outfile)
+    s3client.upload_file(policyfile,'awsgypsy-830488934692-data',CONFIG['account'] + "/" + policyfile)
+    os.remove(policyfile)
+
+
     os.remove(awsgypsy_dir + "/copyui.zip")
     shutil.rmtree( setupdir )
+
+
 
     #create parameters, this is all about putting the config information into a format the cloudformation can read
     params = []
