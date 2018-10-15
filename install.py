@@ -215,7 +215,7 @@ def getprefs():
         print("Which sources would you like to inherrit your policies from? Enter them in order from least important to most important with an empty answer ending the list.")
 
     policies = []
-    policy = "https://github.com/hightekvagabond/awsgypsy/default_policy.json"
+    policy = "http://raw.githubusercontent.com/hightekvagabond/awsgypsy/" + CONFIG['githubbranch'] + "/policies/default_policy.json"
     while policy != "" :
             policies.append(policy)
             if CONFIG['skip_prompts'] != 'y':
