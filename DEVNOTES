@@ -1,0 +1,30 @@
+these are notes for myself to pick up where I left off while working on this in case I have a gap in time between working on it
+
+To make install easier I've created: ~/.aws/awsgypsy/setup_defaults
+
+it looks like this (except profile and account are both actually there):
+
+{
+	"delete_old" : "y",
+	"skip_prompts" : "y",
+	"setup_ui" : "y",
+	"githubbranch" : "work",
+	"account" : "830xxxxxxxxx",
+	"profile" : "830xxxxxxxxx",
+	"region" : "us-west-2"
+}
+
+Don't try to work from your mac, use an ubuntu ec2 instance
+
+
+make sure these libraries are installed:  boto3, sys, getopt, calendar, time, json, zipfile, os, shutil, Repo
+
+
+make sure you have admin with your profile to that account
+
+make sure virtualenv is installed
+
+
+before merging to master always run ops/build_artifacts.py
+
+pip install gitpython

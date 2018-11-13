@@ -71,7 +71,12 @@
 				"Timeout": "300"
 			}
 		},
-##insert_parts_here##
+{
+  "Type" : "AWS::Cognito::UserPool",
+  "Properties" : {
+    "UserPoolName" : "awsgypsy-cognitopool"
+  }
+}
 		},
 	"Outputs": { 
 		"MyStacksRegion": { "Value": { "Ref": "AWS::Region" } },

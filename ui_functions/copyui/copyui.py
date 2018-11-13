@@ -5,7 +5,7 @@ def setup_handler(event, context):
 
     indexfile=uidir + event['setupindex']
     s3client = boto3.client("s3")
-    s3client.put_object(Body="this is the setup log", Bucket=os.environ['databucket'], Key='setup_log.txt')
+    #s3client.put_object(Body="this is the setup log", Bucket=os.environ['databucket'], Key='setup_log.txt')
     s3client.put_object(Body=getfilesfromurl(indexfile), Bucket=os.environ['uibucket'], Key='index.html', ContentType='text/html' ) 
 
 

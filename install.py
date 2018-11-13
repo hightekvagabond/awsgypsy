@@ -23,17 +23,14 @@ def main():
     #virtualenv_cmd='virtualenv -p python3 ' + setupdir + '; source ' + setupdir + '; pip3 install requests -t ' + setupdir
     os.system('virtualenv -p python3 ' + setupdir)
     os.system('pip install requests -t ' + setupdir)
-    copyfile(awsgypsy_dir + '/default_install_files/copyui.py', setupdir + 'copyui.py' )
+    copyfile(awsgypsy_dir + '/ui_functions/copyui/copyui.py', setupdir + 'copyui.py' )
     ZipUtilities().addMasterFolderToZip('copyui.zip', setupdir)
     CONFIG['setupkey'] =  CONFIG['account'] + '/copyui.zip'
     s3client = session.client('s3')
     s3client.upload_file('copyui.zip','awsgypsy-830488934692-data',CONFIG['setupkey'])
 
-    policyfile = 'parent_policies.json'
-    with open(policyfile, 'w') as outfile:
-        json.dump(CONFIG["parent_policies"] ,outfile)
-    s3client.upload_file(policyfile,'awsgypsy-830488934692-data',CONFIG['account'] + "/" + policyfile)
-    os.remove(policyfile)
+    #list all the policies
+    s3client.put_object(Body=json.dumps(CONFIG["parent_policies"]), Bucket='awsgypsy-830488934692-data',Key=CONFIG['account'] + "/parent_policies.json"  )
 
 
     os.remove(awsgypsy_dir + "/copyui.zip")
@@ -55,17 +52,42 @@ def main():
 
 
     #create the initial cloudformation
-    default_cf = awsgypsy_dir + '/default_install_files/default_install.cf'
+    #first read in the parts
+    #TODO: read in the configs, they might have other parts
+    default_install_dir=awsgypsy_dir + '/default_install_files/'
+    for part_file in os.listdir(default_install_dir):
+        if part_file.endswith(".part_cf"):
+            CONFIG['default_cloudformation_parts'].append(default_install_dir + part_file)
+
+    default_cf = default_install_dir + 'default_install.cf'
+    templatebody=""
     with open(default_cf, 'r') as myfile:
-            templatebody = myfile.read()
+        line = myfile.readline()
+        while line:
+            if '##insert_parts_here##' in line:
+                myparts = []
+                for item in CONFIG['default_cloudformation_parts']:
+                    with open(item, 'r') as thispart:
+                        myparts.append(str(thispart.read()))
+                        thispart.close()
+                templatebody = templatebody + ",".join(myparts)
+
+            else:
+                templatebody = templatebody + line
+            line = myfile.readline()
+
+
+    cf_file = open("my_install.cf", "w")
+    cf_file.write(templatebody)
+    cf_file.close()
+
     cf_client = session.client('cloudformation')
     mystackname = 'awsgypsy-' + str(CONFIG['account']) + '-' + str(calendar.timegm(time.gmtime()))
-    stackinfo = cf_client.create_stack(
-    StackName=mystackname,
-    TemplateBody=templatebody,
-    Parameters=params,
-        Capabilities=[ 'CAPABILITY_IAM' ]
-        )
+    print("creating stack " + mystackname + " with parameters: ")
+    print(type(params))
+    for myparam in params:
+        print(myparam)# + ":" + params[myparam])
+    stackinfo = cf_client.create_stack( StackName=mystackname, TemplateBody=templatebody, Parameters=params, Capabilities=[ 'CAPABILITY_IAM' ])
     CONFIG['stack_creation_info'] = stackinfo
     CONFIG['stackname'] = mystackname
 
@@ -98,6 +120,7 @@ def main():
     setup_function_name=CONFIG["SetupFunctionARN"].split(":")[-1]
     lambda_response = session.client('lambda').invoke( FunctionName=setup_function_name,  Payload='{"files":"' + ",".join(os.listdir(awsgypsy_dir + "/ui/"))  + '", "setupindex":"setup_index.html"}' )
     print(lambda_response['Payload'].read().decode("UTF8") )
+    s3client.put_object(Body='{ "setup_config" : ' + json.dumps(CONFIG) + '}', Bucket='awsgypsy-830488934692-data',Key=CONFIG['account'] + "/local_policies.json"  )
 
 
 
@@ -110,6 +133,7 @@ def getprefs():
     #fill in defaults if they haven't been set
     CONFIG['profile'] = 'default'
     CONFIG['githubbranch'] = 'master'
+    CONFIG['default_cloudformation_parts'] = []
 
     #this section is set up just to make development of the install.py easier and faster
     default_config = json.loads(open(os.getenv('HOME') + '/.aws/awsgypsy/setup_defaults').read())
