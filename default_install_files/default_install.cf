@@ -9,69 +9,7 @@
 		"uibucket": { "Type": "String", "Description": "uibucket" }
 	},
 	"Resources": {
-		"awsgypsyLambdaExecutionRole": {
-			"Type": "AWS::IAM::Role",
-			"Properties": {
-				"AssumeRolePolicyDocument": {
-					"Version": "2012-10-17",
-					"Statement": [{
-						"Effect": "Allow",
-						"Principal": { "Service": "lambda.amazonaws.com" },
-						"Action": "sts:AssumeRole"
-					}]
-				},
-				"Path": "/",
-				"Policies": [{
-						"PolicyName": "StatesExecutionPolicy",
-						"PolicyDocument": {
-							"Version": "2012-10-17",
-							"Statement": [{
-								"Effect": "Allow",
-								"Action": [ "lambda:InvokeFunction" ],
-								"Resource": "*"
-							}]
-						}
-					},
-					{
-						"PolicyName": "AWSGypsyBucketList",
-						"PolicyDocument": {
-							"Version": "2012-10-17",
-							"Statement": [{
-								"Effect": "Allow",
-								"Action": [ "s3:ListAllMyBuckets", "s3:HeadBucket" ], 
-								"Resource": "*"
-							}]
-						}},
-						{
-							"PolicyName": "AWSGypsyBucketAccess",
-							"PolicyDocument": {
-								"Version": "2012-10-17",
-								"Statement": [{
-										"Effect": "Allow",
-										"Action": "s3:*",
-										"Resource": [
-											"arn:aws:s3:::*/*",
-											{ "Fn::Join": [":", ["arn:aws:s3::", { "Ref": "databucket" }]] },
-											{ "Fn::Join": [":", ["arn:aws:s3::", { "Ref": "uibucket" }]] }
-
-										]}]
-							}
-						}
-					]
-				}
-			},
-		"copyui": {
-			"Type": "AWS::Lambda::Function",
-			"Properties": {
-				"Handler": "copyui.setup_handler",
-				"Role": { "Fn::GetAtt": [ "awsgypsyLambdaExecutionRole", "Arn" ] },
-				"Code": { "S3Bucket": { "Ref": "databucket" }, "S3Key": { "Ref": "setupkey" } },
-				"Runtime": "python3.6",
-				"Environment": { "Variables": { "databucket": { "Ref": "databucket" }, "uibucket": { "Ref": "uibucket" }, "githubbranch": { "Ref": "githubbranch" } } },
-				"Timeout": "300"
-			}
-		},
-##insert_parts_here##
+##insert_resource_parts_here##
 		},
 	"Outputs": { 
 		"MyStacksRegion": { "Value": { "Ref": "AWS::Region" } },

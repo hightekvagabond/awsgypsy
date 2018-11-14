@@ -1,0 +1,11 @@
+		"copyui": {
+			"Type": "AWS::Lambda::Function",
+			"Properties": {
+				"Handler": "copyui.setup_handler",
+				"Role": { "Fn::GetAtt": [ "awsgypsyLambdaExecutionRole", "Arn" ] },
+				"Code": { "S3Bucket": { "Ref": "databucket" }, "S3Key": { "Ref": "setupkey" } },
+				"Runtime": "python3.6",
+				"Environment": { "Variables": { "databucket": { "Ref": "databucket" }, "uibucket": { "Ref": "uibucket" }, "githubbranch": { "Ref": "githubbranch" } } },
+				"Timeout": "300"
+			}
+		}

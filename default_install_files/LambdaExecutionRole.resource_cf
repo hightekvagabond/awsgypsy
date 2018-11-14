@@ -1,26 +1,4 @@
-{
-	"AWSTemplateFormatVersion": "2010-09-09",
-	"Description": "An example template with an IAM role for a Lambda state machine.",
-	"Parameters": {
-		"databucket": { "Type": "String", "Description": "databucket" },
-		"account": { "Type": "String", "Description": "account" },
-		"setupkey": { "Type": "String", "Description": "setupkey" },
-		"githubbranch": { "Type": "String", "Description": "githubbranch" },
-		"uibucket": { "Type": "String", "Description": "uibucket" }
-	},
-	"Resources": {
-		"copyui": {
-			"Type": "AWS::Lambda::Function",
-			"Properties": {
-				"Handler": "copyui.setup_handler",
-				"Role": { "Fn::GetAtt": [ "awsgypsyLambdaExecutionRole", "Arn" ] },
-				"Code": { "S3Bucket": { "Ref": "databucket" }, "S3Key": { "Ref": "setupkey" } },
-				"Runtime": "python3.6",
-				"Environment": { "Variables": { "databucket": { "Ref": "databucket" }, "uibucket": { "Ref": "uibucket" }, "githubbranch": { "Ref": "githubbranch" } } },
-				"Timeout": "300"
-			}
-		}
-,
+
 		"awsgypsyLambdaExecutionRole": {
 			"Type": "AWS::IAM::Role",
 			"Properties": {
@@ -73,15 +51,3 @@
 				}
 			}
 
-,"cognitopool": {
-  "Type" : "AWS::Cognito::UserPool",
-  "Properties" : {
-    "UserPoolName" : "awsgypsy-cognitopool"
-  }
-}
-		},
-	"Outputs": { 
-		"MyStacksRegion": { "Value": { "Ref": "AWS::Region" } },
-		"SetupFunctionARN": { "Value": { "Fn::GetAtt": ["copyui", "Arn"] } }
-	}
-}

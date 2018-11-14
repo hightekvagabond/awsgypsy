@@ -53,10 +53,10 @@ def main():
 
     #create the initial cloudformation
     #first read in the parts
-    #TODO: read in the configs, they might have other parts
+    #TODO: read in the configs, they might have other parts, maybe use os.walk and just search the whole thing for part files
     default_install_dir=awsgypsy_dir + '/default_install_files/'
     for part_file in os.listdir(default_install_dir):
-        if part_file.endswith(".part_cf"):
+        if part_file.endswith(".resource_cf"):
             CONFIG['default_cloudformation_parts'].append(default_install_dir + part_file)
 
     default_cf = default_install_dir + 'default_install.cf'
@@ -64,7 +64,7 @@ def main():
     with open(default_cf, 'r') as myfile:
         line = myfile.readline()
         while line:
-            if '##insert_parts_here##' in line:
+            if '##insert_resource_parts_here##' in line:
                 myparts = []
                 for item in CONFIG['default_cloudformation_parts']:
                     with open(item, 'r') as thispart:

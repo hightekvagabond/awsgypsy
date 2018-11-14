@@ -1,4 +1,4 @@
-{
+"cognitopool": {
   "Type" : "AWS::Cognito::UserPool",
   "Properties" : {
     "UserPoolName" : "awsgypsy-cognitopool"
